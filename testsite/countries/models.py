@@ -1,4 +1,59 @@
+from dataclasses import dataclass
+from typing import Dict
+
 from django.db import models
+from django.db.models import Count, Sum
+from django.db import models
+from django.db.models import Count, Sum
+from django.db.models.query import QuerySet
+from dataclasses import dataclass
+from typing import Dict, List
+
+@dataclass
+class RegionStats:
+    name: str
+    number_countries: int
+    total_population: int
+
+    def to_dict(self) -> Dict[str, int | str]:
+        return {
+            "name": self.name,
+            "number_countries": self.number_countries,
+            "total_population": self.total_population,
+        }
+
+class RegionQuerySet(QuerySet):
+    def get_stats(self) -> List[RegionStats]:
+        queryset = self.annotate(
+            number_countries=Count("countries"),
+            total_population=Sum("countries__population"),
+        ).values("name", "number_countries", "total_population").order_by("name")
+        return [
+            RegionStats(
+                name=region["name"],
+                number_countries=region["number_countries"],
+                total_population=region["total_population"] or 0,
+            )
+            for region in queryset
+        ]
+
+class RegionManager(models.Manager):
+    def get_queryset(self) -> RegionQuerySet:
+        return RegionQuerySet(self.model, using=self._db)
+
+    def get_stats(self) -> List[RegionStats]:
+        return self.get_queryset().get_stats()
+
+    def to_dict(self) -> Dict[str, List[Dict[str, int | str]]]:
+        return {"regions": [region.to_dict() for region in self.get_stats()]}
+
+
+class Region(models.Model):
+    objects = RegionManager()
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
 
 
 class Country(models.Model):
@@ -12,13 +67,6 @@ class Country(models.Model):
         on_delete=models.CASCADE,
         related_name="countries",
     )
-
-    def __str__(self):
-        return self.name
-
-
-class Region(models.Model):
-    name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name

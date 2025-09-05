@@ -87,3 +87,12 @@ currently extracts and stores the data:
 Please update the models and management command to also import:
  * topLevelDomain
  * capital
+
+### Running with docker compose
+
+```
+docker compose build
+docker compose up
+```
+
+The application can be accessed at [http://localhost:8000/](http://localhost:8000/)

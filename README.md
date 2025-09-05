@@ -34,7 +34,7 @@ python manage.py runserver
 
 ## Exercises
 
-### Exercise 1 - Complete Stats View
+### Exercise 1 - Complete Stats View (Complete)
 
 http://localhost:8000/countries/stats/ currently returns an empty JSON response, this should be updated to provide a list of regions. 
 
@@ -62,7 +62,7 @@ The output format should be:
 }
 ```
 
-### Exercise 2 - Integrate with API
+### Exercise 2 - Integrate with API (Incomplete)
 
 The management command:
 ```bash
@@ -71,7 +71,7 @@ python manage.py update_country_listing
 currently updates the models from a local JSON file. Please update this management command to obtain the JSON input data from this url:  
 https://storage.googleapis.com/dcr-django-test/countries.json
 
-### Exercise 3 - Store additional Data
+### Exercise 3 - Store additional Data (Incomplete)
 
 The management command:
 ```bash

@@ -1,20 +1,17 @@
-import json
-import os
-
-from django.conf import settings
+import requests
 from django.core.management.base import BaseCommand
 
 from countries.models import Country, Region
 
 
 class Command(BaseCommand):
-    help = "Loads country data from a JSON file."
-
-    IMPORT_FILE = os.path.join(settings.BASE_DIR, "..", "data", "countries.json")
+    IMPORT_URL = "https://storage.googleapis.com/dcr-django-test/countries.json"
+    help = f"Loads country data from the URL: {IMPORT_URL}"
 
     def get_data(self):
-        with open(self.IMPORT_FILE) as f:
-            data = json.load(f)
+        response = requests.get(Command.IMPORT_URL)
+        response.raise_for_status()
+        data = response.json()
         return data
 
     def handle(self, *args, **options):
@@ -25,6 +22,7 @@ class Command(BaseCommand):
                 self.stdout.write(
                     self.style.SUCCESS("Region: {} - Created".format(region))
                 )
+
             country, country_created = Country.objects.get_or_create(
                 name=row["name"],
                 defaults={
@@ -34,6 +32,23 @@ class Command(BaseCommand):
                     "region": region,
                 },
             )
+
+            fields_to_update = [
+                x
+                for x in Country._meta.fields
+                if not x.primary_key
+                and x.name in row
+                and getattr(country, x.name) != row[x.name]
+                and row[x.name] is not None
+            ]
+
+            # Update country changes
+            for field in fields_to_update:
+                value = region if field.name == "region" else row.get(field.name)
+                setattr(country, field.name, value)
+
+            if not country_created or fields_to_update:
+                country.save()
 
             self.stdout.write(
                 self.style.SUCCESS(

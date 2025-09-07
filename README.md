@@ -62,7 +62,7 @@ The output format should be:
 }
 ```
 
-### Exercise 2 - Integrate with API (Incomplete)
+### Exercise 2 - Integrate with API (Complete)
 
 The management command:
 ```bash

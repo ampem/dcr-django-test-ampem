@@ -81,5 +81,16 @@ class Country(models.Model):
 
     topLevelDomain = models.ManyToManyField(TopLevelDomain, blank=True)
 
+    def to_dict(self) -> Dict[str, int | str]:
+        return {
+            "name": self.name,
+            "alpha2Code": self.alpha2Code,
+            "alpha3Code": self.alpha3Code,
+            "population": self.population,
+            "capital": self.capital,
+            "region": self.region.name,
+            "topLevelDomain": [topLevelDomain.name for topLevelDomain in self.topLevelDomain.all()],
+        }
+
     def __str__(self):
         return self.name

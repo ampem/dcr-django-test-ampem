@@ -71,7 +71,7 @@ python manage.py update_country_listing
 currently updates the models from a local JSON file. Please update this management command to obtain the JSON input data from this url:  
 https://storage.googleapis.com/dcr-django-test/countries.json
 
-### Exercise 3 - Store additional Data (Incomplete)
+### Exercise 3 - Store additional Data (Complete)
 
 The management command:
 ```bash
@@ -92,7 +92,69 @@ Please update the models and management command to also import:
 
 ```
 docker compose build
-docker compose up
+docker compose up -d
 ```
 
-The application can be accessed at [http://localhost:8000/](http://localhost:8000/)
+The application can be accessed at [http://localhost:8000/](http://localhost:8000/) or http://api:8000/ within the docker container.
+
+#### testing the API endpoints
+
+```bash
+docker compose exec dev http http://api:8000/countries/stats/
+```
+
+```json
+{
+    "regions": [
+        {
+            "name": "Africa",
+            "number_countries": 60,
+            "total_population": 1185705747
+        },
+        ...
+    ]
+}
+```
+
+```bash
+docker compose exec dev http http://api:8000/countries/id:611/
+```
+
+```json
+{
+    "country": {
+        "alpha2Code": "JP",
+        "alpha3Code": "JPN",
+        "capital": "Tokyo",
+        "name": "Japan",
+        "population": 126960000,
+        "region": "Asia",
+        "topLevelDomain": [
+            ".jp"
+        ]
+    }
+}
+```
+
+
+```bash
+docker compose exec dev http "http://api:8000/countries/name:Saint Martin (French part)/"
+```
+
+```json
+{
+    "country": {
+        "alpha2Code": "MF",
+        "alpha3Code": "MAF",
+        "capital": "Marigot",
+        "name": "Saint Martin (French part)",
+        "population": 36979,
+        "region": "Americas",
+        "topLevelDomain": [
+            ".fr",
+            ".gp",
+            ".mf"
+        ]
+    }
+}
+```

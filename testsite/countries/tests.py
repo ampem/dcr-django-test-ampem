@@ -68,7 +68,7 @@ class CountryViewsTests(TestCase):
     # Unit Test: Test RegionQuerySet get_stats with real data
     def test_region_queryset_get_stats_real_data(self):
         # Create additional data
-        country2 = Country.objects.create(  # pylint: disable=unused-variable
+        Country.objects.create(
             name="Ghana",
             alpha2Code="GH",
             alpha3Code="GHA",

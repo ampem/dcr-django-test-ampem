@@ -62,6 +62,24 @@ class CountryViewsTests(TestCase):
         self.assertEqual(stats[0].number_countries, 0)
         self.assertEqual(stats[0].total_population, 0)
 
+    # Unit Test: Test RegionQuerySet get_stats with real data
+    def test_region_queryset_get_stats_real_data(self):
+        # Create additional data
+        country2 = Country.objects.create(
+            name='Ghana',
+            alpha2Code='GH',
+            alpha3Code='GHA',
+            population=30000,
+            capital='Accra',
+            region=self.region
+        )
+        stats = Region.objects.get_stats()
+        self.assertEqual(len(stats), 1)
+        self.assertIsInstance(stats[0], RegionStats)
+        self.assertEqual(stats[0].name, 'Africa')
+        self.assertEqual(stats[0].number_countries, 2)
+        self.assertEqual(stats[0].total_population, 230000)  # 200000 + 30000
+
     # Unit Test: Test RegionManager to_dict
     @patch('countries.models.RegionQuerySet.values')
     def test_region_manager_to_dict(self, mock_values):
@@ -102,8 +120,6 @@ class CountryViewsTests(TestCase):
         response = self.client.get(self.stats_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {'regions': []})
-
-
 
     # Unit Test: Test country detail view by ID
     def test_country_detail_view_by_id(self):
@@ -254,3 +270,48 @@ class CountryViewsTests(TestCase):
             }
         }
         self.assertEqual(response.json(), expected_data)
+
+    # Unit Test: Test country detail view by ID with multiple TLDs
+    def test_country_detail_view_by_id_multiple_tlds(self):
+        # Create additional TLD
+        tld2 = TopLevelDomain.objects.create(name='.org')
+        self.country.topLevelDomain.add(tld2)
+        response = self.client.get(self.detail_url_by_id)
+        self.assertEqual(response.status_code, 200)
+        expected_data = {
+            'country': {
+                'name': 'Nigeria',
+                'alpha2Code': 'NG',
+                'alpha3Code': 'NGA',
+                'population': 200000,
+                'capital': 'Abuja',
+                'region': 'Africa',
+                'topLevelDomain': ['.com', '.org'],
+            }
+        }
+        self.assertEqual(response.json(), expected_data)
+
+    # Unit Test: Test country detail view by name case-insensitive
+    def test_country_detail_view_by_name_case_insensitive(self):
+        response = self.client.get(f'/countries/name:nigeria/')
+        self.assertEqual(response.status_code, 200)
+        expected_data = {
+            'country': {
+                'name': 'Nigeria',
+                'alpha2Code': 'NG',
+                'alpha3Code': 'NGA',
+                'population': 200000,
+                'capital': 'Abuja',
+                'region': 'Africa',
+                'topLevelDomain': ['.com'],
+            }
+        }
+        self.assertEqual(response.json(), expected_data)
+
+    # Unit Test: Test Region __str__
+    def test_region_str(self):
+        self.assertEqual(str(self.region), 'Africa')
+
+    # Unit Test: Test TopLevelDomain __str__
+    def test_topleveldomain_str(self):
+        self.assertEqual(str(self.tld), '.com')

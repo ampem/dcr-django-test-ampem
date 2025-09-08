@@ -158,3 +158,38 @@ docker compose exec dev http "http://api:8000/countries/name:Saint Martin (Frenc
     }
 }
 ```
+#### Running tests / coverage
+
+Linting
+```bash
+docker compose exec dev pylint testsite/countries
+```
+
+```
+--------------------------------------------------------------------
+Your code has been rated at 10.00/10 (previous run: 10.00/10, +0.00)
+
+```
+
+
+
+```bash
+docker compose exec dev bash -c "cd testsite && coverage report"
+```
+
+```
+Name                                              Stmts   Miss  Cover
+---------------------------------------------------------------------
+countries/__init__.py                                 0      0   100%
+countries/admin.py                                    8      0   100%
+countries/apps.py                                     3      3     0%
+countries/migrations/0001_initial.py                  6      0   100%
+countries/migrations/0002_auto_20250908_0211.py       4      0   100%
+countries/migrations/__init__.py                      0      0   100%
+countries/models.py                                  44      1    98%
+countries/tests.py                                  123      0   100%
+countries/urls.py                                     3      0   100%
+countries/views.py                                   19      0   100%
+---------------------------------------------------------------------
+TOTAL                                               210      4    98%
+```

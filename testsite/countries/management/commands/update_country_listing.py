@@ -61,9 +61,7 @@ class Command(BaseCommand):
                     country.topLevelDomain.filter(name__in=tlds_to_remove).delete()
 
                 for tld in tlds_to_add:
-                    new_tld, _ = TopLevelDomain.objects.get_or_create(
-                        name=tld
-                    )
+                    new_tld, _ = TopLevelDomain.objects.get_or_create(name=tld)
                     country.topLevelDomain.add(new_tld)
 
             if not country_created or fields_to_update:

@@ -62,7 +62,6 @@ class Command(BaseCommand):
 
                 for tld in tlds_to_add:
                     new_tld, _ = TopLevelDomain.objects.get_or_create(
-                        defaults={"name":tld},
                         name=tld
                     )
                     country.topLevelDomain.add(new_tld)

@@ -89,7 +89,9 @@ class Country(models.Model):
             "population": self.population,
             "capital": self.capital,
             "region": self.region.name,
-            "topLevelDomain": [topLevelDomain.name for topLevelDomain in self.topLevelDomain.all()],
+            "topLevelDomain": [
+                topLevelDomain.name for topLevelDomain in self.topLevelDomain.all()
+            ],
         }
 
     def __str__(self):

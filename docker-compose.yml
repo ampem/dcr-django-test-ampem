@@ -1,5 +1,5 @@
 services:
-  testsite:
+  api:
     build:
       context: .
       dockerfile: Dockerfile
@@ -8,5 +8,14 @@ services:
       - ./testsite:/app
     ports:
       - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: tail -f /dev/null
+    volumes:
+      - .:/app
     environment:
       - PYTHONUNBUFFERED=1

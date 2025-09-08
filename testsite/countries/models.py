@@ -1,13 +1,10 @@
 from dataclasses import dataclass
-from typing import Dict
+from typing import Dict, List
 
 from django.db import models
 from django.db.models import Count, Sum
-from django.db import models
-from django.db.models import Count, Sum
 from django.db.models.query import QuerySet
-from dataclasses import dataclass
-from typing import Dict, List
+
 
 @dataclass
 class RegionStats:
@@ -22,12 +19,17 @@ class RegionStats:
             "total_population": self.total_population,
         }
 
+
 class RegionQuerySet(QuerySet):
     def get_stats(self) -> List[RegionStats]:
-        queryset = self.annotate(
-            number_countries=Count("countries"),
-            total_population=Sum("countries__population"),
-        ).values("name", "number_countries", "total_population").order_by("name")
+        queryset = (
+            self.annotate(
+                number_countries=Count("countries"),
+                total_population=Sum("countries__population"),
+            )
+            .values("name", "number_countries", "total_population")
+            .order_by("name")
+        )
         return [
             RegionStats(
                 name=region["name"],
@@ -36,6 +38,7 @@ class RegionQuerySet(QuerySet):
             )
             for region in queryset
         ]
+
 
 class RegionManager(models.Manager):
     def get_queryset(self) -> RegionQuerySet:
@@ -53,7 +56,14 @@ class Region(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.name
+        return str(self.name)
+
+
+class TopLevelDomain(models.Model):
+    name = models.CharField(max_length=63 + 1, unique=True)
+
+    def __str__(self):
+        return str(self.name)
 
 
 class Country(models.Model):
@@ -61,6 +71,7 @@ class Country(models.Model):
     alpha2Code = models.CharField(max_length=2)
     alpha3Code = models.CharField(max_length=3)
     population = models.IntegerField()
+    capital = models.CharField(blank=True, default="", max_length=100, null=False)
 
     region = models.ForeignKey(
         "Region",
@@ -68,5 +79,20 @@ class Country(models.Model):
         related_name="countries",
     )
 
+    topLevelDomain = models.ManyToManyField(TopLevelDomain, blank=True)
+
+    def to_dict(self) -> Dict[str, int | str | List[str]]:
+        return {
+            "name": self.name,
+            "alpha2Code": self.alpha2Code,
+            "alpha3Code": self.alpha3Code,
+            "population": self.population,
+            "capital": self.capital,
+            "region": self.region.name,
+            "topLevelDomain": [
+                topLevelDomain.name for topLevelDomain in self.topLevelDomain.all()
+            ],
+        }
+
     def __str__(self):
-        return self.name
+        return str(self.name)

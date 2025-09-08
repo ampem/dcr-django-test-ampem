@@ -68,7 +68,7 @@ class CountryViewsTests(TestCase):
     # Unit Test: Test RegionQuerySet get_stats with real data
     def test_region_queryset_get_stats_real_data(self):
         # Create additional data
-        country2 = Country.objects.create(
+        country2 = Country.objects.create(  # pylint: disable=unused-variable
             name="Ghana",
             alpha2Code="GH",
             alpha3Code="GHA",
@@ -304,7 +304,7 @@ class CountryViewsTests(TestCase):
 
     # Unit Test: Test country detail view by name case-insensitive
     def test_country_detail_view_by_name_case_insensitive(self):
-        response = self.client.get(f"/countries/name:nigeria/")
+        response = self.client.get("/countries/name:nigeria/")
         self.assertEqual(response.status_code, 200)
         expected_data = {
             "country": {

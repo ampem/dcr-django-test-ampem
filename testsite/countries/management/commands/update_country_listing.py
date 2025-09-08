@@ -53,7 +53,7 @@ class Command(BaseCommand):
 
             # Update topLevelDomain entries
             data_tld_set = set(row['topLevelDomain'])
-            tld_set = set(country.topLevelDomain.all())
+            tld_set = set(tld.name for tld in country.topLevelDomain.all())
             if data_tld_set != tld_set:
                 tlds_to_add = data_tld_set.difference(tld_set)
                 tlds_to_remove = tld_set.difference(data_tld_set)
